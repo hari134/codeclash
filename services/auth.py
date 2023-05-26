@@ -7,7 +7,9 @@ auth_routes = Blueprint('auth_routes',__name__)
 def register():
     username = request.json.get('username')
     password = request.json.get('password')
-    print(username)
+    email = request.json.get('email')
+    usn = request.json.get('usn')
+    
     users = get_collection('users')
 
     # Check if the username already exists
@@ -15,7 +17,7 @@ def register():
         return jsonify({'message': 'Username already exists'})
 
     # Insert the new user into the database
-    users.insert_one({'username': username, 'password': password})
+    users.insert_one({'username': username, 'password': password, 'usn':usn,'email':email})
 
     return jsonify({'message': 'Registration successful'})
 
@@ -31,3 +33,13 @@ def login():
         return jsonify({'message': 'Login successful'})
     else:
         return jsonify({'message': 'Invalid credentials'})
+
+
+@auth_routes.route('/all_users',methods=['GET'])
+def get_all_users():
+    users = get_collection('users')
+    data = users.find({},{"_id":0})
+    _data = []
+    for d in data:
+        _data.append(d)
+    return jsonify({'message': _data})
